@@ -8,7 +8,7 @@ var app = getApp();
  * @param url {string} 请求url
  * @param data {object} 参数
  * @param successCallback {function} 成功回调函数
- * @param errorCallback {function} 失败回调函数
+ * @param errorCallback {function} 失败回调函数，参数为错误信息对象
  * @param completeCallback {function} 完成回调函数
  * @returns {void}
  */
@@ -24,13 +24,18 @@ function requestData( url, data, successCallback, errorCallback, completeCallbac
             if( app.debug ) {
                 console.log( 'response data: ', res );
             }
-            if( res.statusCode == 200 )
+            if( res.statusCode == 200 ) {
                 util.isFunction( successCallback ) && successCallback( res.data );
-            else
-                util.isFunction( errorCallback ) && errorCallback();
+            } else {
+                var error = { url: url, statusCode: res.statusCode, data: res.data };
+                console.error( 'requestData failed: ', error );
+                util.isFunction( errorCallback ) && errorCallback( error );
+            }
         },
-        error: function() {
-            util.isFunction( errorCallback ) && errorCallback();
+        fail: function( res ) {
+            var error = { url: url, errMsg: res && res.errMsg };
+            console.error( 'requestData failed: ', error );
+            util.isFunction( errorCallback ) && errorCallback( error );
         },
         complete: function() {
             util.isFunction( completeCallback ) && completeCallback();

@@ -27,9 +27,8 @@ Page({
           that.fetchData(id)
         }
       },
-      fail: function() {
-      },
-      complete: function() {
+      fail: function(e) {
+        console.error('getStorage lastPage failed: ', e)
       }
     })
   },
@@ -44,10 +43,14 @@ Page({
         'appSecret': app.api.appSecret,
       },
       success:function(res) {
-        if (res.statusCode == 200) {
+        if (res.statusCode != 200) {
+          console.error('fetch share detail failed: ', res.statusCode, res.data)
+          wx.showToast({ title: '加载失败，请重试', icon: 'none' })
+        } else {
           var resposneData = res.data;
           if (resposneData.errorCode != 0) {
-            //
+            console.error('fetch share detail returned error: ', resposneData)
+            wx.showToast({ title: resposneData.errorMessage || '加载失败，请重试', icon: 'none' })
           } else {
             that.setData({
               detail: resposneData.results
@@ -55,7 +58,9 @@ Page({
           }
         }
       },
-      fail:function() {
+      fail:function(e) {
+        console.error('fetch share detail request failed: ', e)
+        wx.showToast({ title: '网络异常，请重试', icon: 'none' })
       },
       complete:function() {
         that.setData({

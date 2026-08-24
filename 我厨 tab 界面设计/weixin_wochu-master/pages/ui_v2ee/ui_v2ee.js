@@ -38,14 +38,9 @@ Page({
     console.log(event);
     wx.navigateTo({
       url:'../../pages/posts/posts',
-      success:function(res){
-
-      },
-      fail:function(){
-
-      },
-      complete:function(){
-
+      fail:function(err){
+        console.error('navigateTo posts failed: ', err);
+        wx.showToast({ title: '页面跳转失败', icon: 'none' });
       }
     })
   }

@@ -25,9 +25,8 @@ Page({
         var uid = res.data.uid
         that.fetchData(token, uid)
       },
-      fail: function() {
-      },
-      complete: function() {
+      fail: function(e) {
+        console.error('getStorage loginInfo failed: ', e)
       }
     })
   },
@@ -46,10 +45,16 @@ Page({
         'token': token
       },
       success:function(res) {
+        if (res.statusCode != 200) {
+          console.error('fetch me/index failed: ', res.statusCode, res.data)
+          wx.showToast({ title: '加载失败，请重试', icon: 'none' })
+          return
+        }
         console.log(res.data)
       },
-      fail:function() {
-        console.log()
+      fail:function(e) {
+        console.error('fetch me/index request failed: ', e)
+        wx.showToast({ title: '网络异常，请重试', icon: 'none' })
       },
       complete:function() {
         console.log('request complete')

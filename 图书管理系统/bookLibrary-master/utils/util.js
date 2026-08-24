@@ -14,6 +14,7 @@ function formatNumber(n) {
 }
 
 
+//cb的签名为 cb(res, err)：请求成功时err为null，失败时res为null
 function request(option, cb) {
 
   wx.request({
@@ -22,10 +23,17 @@ function request(option, cb) {
     method: option.method ? option.method : 'GET', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
     header: option.header ? option.header : { 'content-type': 'application/json' }, // 设置请求的 header
     success: function (res) {
-      cb(res);
+      if (res.statusCode >= 200 && res.statusCode < 300) {
+        cb(res, null);
+        return;
+      }
+      var err = { url: option.url, statusCode: res.statusCode, data: res.data };
+      console.error('request failed: ', err);
+      cb(null, err);
     },
     fail: function (err) {
-      cb(err);
+      console.error('request failed: ', option.url, err && err.errMsg);
+      cb(null, err || { url: option.url, errMsg: 'request:fail' });
     }
   });
 
@@ -41,6 +49,14 @@ function showLoading() {
 
 function hideLoading() {
   wx.hideToast();
+}
+
+function showError(msg) {
+  wx.showToast({
+    title: msg,
+    icon: 'none',
+    duration: 2000
+  });
 }
 
 function showSuccess(msg, time, cb) {
@@ -112,6 +128,7 @@ module.exports = {
   request: request,
   showLoading: showLoading,
   hideLoading: hideLoading,
+  showError: showError,
   genBookData: genBookData,
   showSuccess: showSuccess,
   getISBN13: getISBN13

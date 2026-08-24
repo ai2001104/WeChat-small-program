@@ -9,7 +9,12 @@ App({
         _this.cache = data;
         _this.processData(data);
       }
-    }catch(e){}
+    }catch(e){
+      //缓存损坏时清除，避免每次启动都读到坏数据
+      console.error('read cache failed: ', e);
+      wx.removeStorage({ key: 'cache' });
+      _this.cache = '';
+    }
   },
   //后台切换至前台时
   onShow: function(){
@@ -60,6 +65,8 @@ App({
                     wx.removeStorage({ key: 'cache' });
                     _this.cache = '';
                   }
+                  console.error('get_info returned error: ', res.data);
+                  _this.showErrorModal(res.data && res.data.msg ? res.data.msg : '获取用户数据失败，请重试');
                 }
               },
               fail: function(res){
@@ -68,10 +75,21 @@ App({
                   wx.removeStorage({ key: 'cache' });
                   _this.cache = '';
                 }
+                console.error('get_info request failed: ', res && res.errMsg);
+                _this.showErrorModal('网络异常，请稍后重试');
               }
             });
+          }, function(err){
+            _this.showErrorModal('获取微信用户信息失败，请重试');
           });
+        }else{
+          console.error('wx.login returned no code: ', res);
+          _this.showErrorModal('微信登录失败，请重试');
         }
+      },
+      fail: function(err){
+        console.error('wx.login failed: ', err);
+        _this.showErrorModal('微信登录失败，请重试');
       }
     });
   },
@@ -86,11 +104,21 @@ App({
     _this._t = data['\x74\x6f\x6b\x65\x6e'];
     return data;
   },
-  getUserInfo: function(cb){
+  //errCb在获取微信用户信息失败时被调用，参数为错误信息
+  getUserInfo: function(cb, errCb){
+    var _this = this;
     //获取微信用户信息
     wx.getUserInfo({
       success: function(res){
         typeof cb == "function" && cb(res);
+      },
+      fail: function(err){
+        console.error('getUserInfo failed: ', err);
+        if(typeof errCb == "function"){
+          errCb(err);
+        }else{
+          _this.showErrorModal('获取微信用户信息失败，请重试');
+        }
       }
     });
   },

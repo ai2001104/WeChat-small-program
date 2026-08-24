@@ -35,7 +35,11 @@ Page({
       }
     };
 
-    util.request(options, function (res) {
+    util.request(options, function (res, err) {
+      if (err) {
+        util.showError('获取借阅记录失败，请重试');
+        return;
+      }
       if (typeof (res.data.result) !== 'undefined') {
         var books = [];
         var results = res.data.result.value;
@@ -52,6 +56,10 @@ Page({
           };
 
           util.request(option1, (res, err) => {
+            if (err || typeof (res.data.result) === 'undefined') {
+              util.showError('获取图书信息失败，请重试');
+              return;
+            }
             var book = res.data.result.value;
             // console.log(results[i]);
             // var newDate = new Date();
@@ -93,6 +101,10 @@ Page({
     };
 
     util.request(options, (res, err) => {
+      if (err) {
+        util.showError('查询图书失败，请重试');
+        return;
+      }
       var books = [];
       for (var i = 0; i < res.data.result.length; i++) {
         books.push(res.data.result[i].value);

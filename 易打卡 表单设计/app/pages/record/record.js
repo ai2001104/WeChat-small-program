@@ -142,8 +142,8 @@ Page({
           'absent': d.absent
         })
       },
-      fail: function() {
-        // fail
+      fail: function(err) {
+        console.error('sign api request failed: ', err)
         wx.showToast({
           title: '请输入有效日期',
           icon: 'loading',
@@ -173,8 +173,13 @@ Page({
           aRecordList: res.data.data
         })
       },
-      fail: function() {
-        // fail
+      fail: function(err) {
+        console.error('getAllRecord request failed: ', err)
+        wx.showToast({
+          title: '获取记录失败，请重试',
+          icon: 'none',
+          duration: 2000
+        })
       },
       complete: function() {
         // complete
@@ -224,8 +229,8 @@ Page({
           'sbsent': d.absent
         })
       },
-      fail: function() {
-        // fail
+      fail: function(err) {
+        console.error('sign api request failed: ', err)
         wx.showToast({
           title: '请输入有效日期',
           icon: 'loading',
@@ -274,8 +279,13 @@ Page({
         }
 
       },
-      fail: function() {
-
+      fail: function(err) {
+        console.error('getSingleRecord request failed: ', err)
+        wx.showToast({
+          title: '获取记录失败，请重试',
+          icon: 'none',
+          duration: 2000
+        })
       },
       complete: function() {
         // complete

@@ -28,25 +28,29 @@ Page({
             },
             method: 'POST', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
             success: function (res) {
-                wx.setStorageSync('logined', res.data);
+                if (res.statusCode < 200 || res.statusCode >= 300) {
+                    console.error('login failed: ', res.statusCode, res.data);
+                    wx.showToast({ title: '登录失败，请检查账号密码', icon: 'none' });
+                    return;
+                }
+                try {
+                    wx.setStorageSync('logined', res.data);
+                } catch (e) {
+                    console.error('setStorageSync logined failed: ', e);
+                    wx.showToast({ title: '登录信息保存失败', icon: 'none' });
+                    return;
+                }
                 wx.redirectTo({
                     url: '../index',
-                    success: function (res) {
-                        // success
-                    },
-                    fail: function () {
-                        // fail
-                    },
-                    complete: function () {
-                        // complete
+                    fail: function (err) {
+                        console.error('redirectTo index failed: ', err);
+                        wx.showToast({ title: '页面跳转失败', icon: 'none' });
                     }
                 })
             },
-            fail: function () {
-
-            },
-            complete: function () {
-                // complete
+            fail: function (err) {
+                console.error('login request failed: ', err);
+                wx.showToast({ title: '网络异常，登录失败', icon: 'none' });
             }
         })
     }
