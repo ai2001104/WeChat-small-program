@@ -61,7 +61,9 @@ app.use(session({
 	secret: config.secret
 }))
 
-app.use(cors())
+app.use(cors({
+	origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : false
+}))
 
 app.use((req, res, next) => {
 	if(req.path.indexOf('/api') === -1) {
@@ -78,7 +80,7 @@ app.use((req, res, next) => {
 // custom middleware
 app.use(/\/api/, tools)
 app.use(/^((?!sign\/up|sign\/in|captcha).)+$/, [
-	jwt({ secret: config.secret}), 
+	jwt({ secret: config.secret, algorithms: ['HS256'] }), 
 	auth.verifyToken.bind(auth)
 ])
 
@@ -117,7 +119,7 @@ app.use((err, req, res, next) => {
 	res.render('error', {
 		layout: false,
 		message: err.message,
-		error: err
+		error: {}
 	})
 })
 

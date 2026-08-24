@@ -1,5 +1,7 @@
+import crypto from 'crypto'
+
 export default {
-	secret: '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
+	secret: process.env.APP_SECRET || crypto.randomBytes(32).toString('hex'),
 	mongo: {
 		development: {
 			connectionString: 'mongodb://127.0.0.1:27017/mall'
@@ -21,8 +23,8 @@ export default {
 		path: 'public/uploads/'
 	},
 	superAdmin: {
-		username: 'admin', 
-		password: '123456', 
+		username: process.env.SUPER_ADMIN_USERNAME || 'admin', 
+		password: process.env.SUPER_ADMIN_PASSWORD || crypto.randomBytes(16).toString('hex'), 
 	},
 	orderStatus: {
 		'submitted': '已提交', 
@@ -31,7 +33,7 @@ export default {
 		'finished' : '已完成', 
 	},
 	wechat: {
-		appid: 'wx4ec54c44008298ec', 
-		secret: '8295e6dd753aab17624e0bb0e1c4e98d', 
+		appid: process.env.WECHAT_APPID || '', 
+		secret: process.env.WECHAT_SECRET || '', 
 	},
 }

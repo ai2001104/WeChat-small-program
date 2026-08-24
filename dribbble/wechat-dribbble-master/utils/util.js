@@ -1,7 +1,7 @@
 const api = require('api.js');
 const dateFormat = require('dateFormat.js');
 
-const TOKEN = "f580a93a3cacd178bf7d2f2a7e79f3982c7990d908a008f7ee5cf50388f00877";
+const TOKEN = "YOUR_DRIBBBLE_ACCESS_TOKEN";
 
 /*
  * 请求封装
