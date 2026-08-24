@@ -65,7 +65,7 @@ App( {
     wx.request( {
       url: url,
       data: {
-        grant_type: 'client_credentials', client_id: 'YgMAXXnP0Lziw0LPVbc6E4zm', client_secret: 'Q1BYOGgl3sMjoXSBAx5bMrIuOHSfoMh9'
+        grant_type: 'client_credentials', client_id: 'YOUR_BAIDU_CLIENT_ID', client_secret: 'YOUR_BAIDU_CLIENT_SECRET'
       },
       header: {
         'Content-Type': 'application/json'

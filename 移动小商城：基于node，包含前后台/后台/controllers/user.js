@@ -198,6 +198,7 @@ class Ctrl{
 		const username = req.body.username
 		const password = req.body.password
 
+		if (typeof username !== 'string' || typeof password !== 'string') return res.tools.setJson(1, '用户名或密码错误')
 		if (!username || !password) return res.tools.setJson(1, '用户名或密码错误')
 		
 		this.model.findByName(username)
@@ -242,6 +243,7 @@ class Ctrl{
 		const username = req.body.username
 		const password = req.body.password
 		
+		if (typeof username !== 'string' || typeof password !== 'string') return res.tools.setJson(1, '用户名或密码错误')
 		if (!username || !password) return res.tools.setJson(1, '用户名或密码错误')	
 		if (req.body.code !== req.session.code) return res.tools.setJson(1, '验证码错误')
 
@@ -326,6 +328,7 @@ class Ctrl{
 		const oldpwd = req.body.oldpwd
 		const newpwd = req.body.newpwd
 			
+		if (typeof oldpwd !== 'string' || typeof newpwd !== 'string') return res.tools.setJson(1, '密码错误')
 		if (oldpwd && newpwd) {
 			this.model.findByName(req.user.username)
 			.then(doc => {
@@ -369,12 +372,14 @@ class Ctrl{
 	 *     }
 	 */
 	saveInfo(req, res, next) {
+		const allowedFields = ['birthday', 'email', 'gender', 'avatar', 'nickname', 'tel']
+
 		this.model.findByName(req.user.username)
 		.then(doc => {
 			if (!doc) return res.tools.setJson(1, '用户不存在或已删除')
 
-			for(let key in req.body) {
-				doc[key] = req.body[key]
+			for(let key of allowedFields) {
+				if (req.body[key] !== undefined) doc[key] = req.body[key]
 			}
 
 			doc.update_at = Date.now()

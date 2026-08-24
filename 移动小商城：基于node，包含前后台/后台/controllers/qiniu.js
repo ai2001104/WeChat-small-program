@@ -44,10 +44,10 @@ class Ctrl{
 	 */
 	initClient() {
 		this.client = qn.create({
-			accessKey: 'AIoInqqk9hMIdzCVpUuUmAS8PhFgrO6MXsse4PFD',
-			secretKey: 'wh3JtbPWa2kCW22wRd17DJ6v1hPhSRB5fSWPw6UN',
-			bucket   : 'skyvow',
-			origin   : 'http://7xo4dc.com1.z0.glb.clouddn.com/',
+			accessKey: process.env.QINIU_ACCESS_KEY || '',
+			secretKey: process.env.QINIU_SECRET_KEY || '',
+			bucket   : process.env.QINIU_BUCKET || 'skyvow',
+			origin   : process.env.QINIU_ORIGIN || 'http://7xo4dc.com1.z0.glb.clouddn.com/',
 		})
 	}
 

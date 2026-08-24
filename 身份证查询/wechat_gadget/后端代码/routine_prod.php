@@ -11,9 +11,15 @@ $key = '';
 
 switch ($type){
     case 'card' :
-        $key = '86f79e974dd392f4c48e226aa3f8ed0c';
-        $cardno = $_GET['cardno'];
-        $get_res = file_get_contents('http://apis.juhe.cn/idcard/index?cardno='.$cardno.'&key='.$key );
+        $key = getenv('JUHE_API_KEY');
+        if ($key === false || $key === '') {
+            die('error : missing JUHE_API_KEY');
+        }
+        $cardno = isset($_GET['cardno']) ? trim($_GET['cardno']) : '';
+        if (!preg_match('/^\d{17}[\dXx]$/', $cardno)) {
+            die('error : invalid cardno');
+        }
+        $get_res = file_get_contents('http://apis.juhe.cn/idcard/index?cardno='.urlencode($cardno).'&key='.urlencode($key) );
         echo $get_res;
         break;
 
