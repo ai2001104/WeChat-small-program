@@ -38,6 +38,9 @@ Page({
           windowHeight: res.windowHeight,
           pixelRatio: res.pixelRatio
         });
+      },
+      fail: function (err) {
+        console.error('getSystemInfo failed: ', err);
       }
     });
 
@@ -51,6 +54,10 @@ Page({
     });
 
     db.selectBookFromDouban(isbn13, (res, err) => {
+      if (err) {
+        util.showError('获取图书信息失败，请重试');
+        return;
+      }
       var book = res.data;
 
       if (options.qty) {
@@ -162,7 +169,11 @@ Page({
         type: 'bookBorrow'
       }
     };
-    util.request(option1, res => {
+    util.request(option1, (res, err) => {
+      if (err) {
+        util.showError('借阅失败，请重试');
+        return;
+      }
       //console.log(res.data.result.value);
       var borrowList;
       //如果有找到数据，证明这个人有借过书 
@@ -187,7 +198,11 @@ Page({
         }
       }
 
-      util.request(borrowOptions, res => {
+      util.request(borrowOptions, (res, err) => {
+        if (err) {
+          util.showError('借阅失败，请重试');
+          return;
+        }
         //console.log(res);
         if (res.data.result === empno) {
           //2.把qty-1，然后重新insert到数据库，覆盖原来的数据
@@ -208,14 +223,17 @@ Page({
           };
 
           util.request(options, (res, err) => {
-            if (res.data.success) {
-
-              util.showSuccess('借阅成功!', config.showSuccessTime, () => {
-                wx.navigateBack();
-              })
+            if (err || !res.data.success) {
+              util.showError('借阅失败，请重试');
+              return;
             }
+            util.showSuccess('借阅成功!', config.showSuccessTime, () => {
+              wx.navigateBack();
+            })
           });
 
+        } else {
+          util.showError('借阅失败，请重试');
         }
       })
 
@@ -241,7 +259,11 @@ Page({
     };
 
     //var nowTimestamp = new Date().getTime();
-    util.request(option1, res => {
+    util.request(option1, (res, err) => {
+      if (err) {
+        util.showError('录入失败，请重试');
+        return;
+      }
       if (typeof (res.data.result) !== 'undefined') {
         this.data.bookMsg.qty +=parseInt(this.data.addBookQty) - 0 ;
         //this.data.bookMsg.borrowDate =nowTimestamp;
@@ -261,12 +283,13 @@ Page({
         };
 
         util.request(options, (res, err) => {
-          if (res.data.success) {
-
-            util.showSuccess('录入成功!', config.showSuccessTime, () => {
-              wx.navigateBack();
-            })
+          if (err || !res.data.success) {
+            util.showError('录入失败，请重试');
+            return;
           }
+          util.showSuccess('录入成功!', config.showSuccessTime, () => {
+            wx.navigateBack();
+          })
         });
       } else {
         this.data.bookMsg.qty = parseInt(this.data.addBookQty) - 0;
@@ -286,12 +309,13 @@ Page({
         };
 
         util.request(options, (res, err) => {
-          if (res.data.success) {
-
-            util.showSuccess('录入成功!', config.showSuccessTime, () => {
-              wx.navigateBack();
-            })
+          if (err || !res.data.success) {
+            util.showError('录入失败，请重试');
+            return;
           }
+          util.showSuccess('录入成功!', config.showSuccessTime, () => {
+            wx.navigateBack();
+          })
         });
 
       }

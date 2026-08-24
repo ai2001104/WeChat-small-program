@@ -65,8 +65,8 @@ Page({
         }
       },
       fail: function(e) {
-      },
-      complete: function() {
+        console.error('getLocation failed: ', e)
+        wx.showToast({ title: '获取位置失败', icon: 'none' })
       }
     })
 
@@ -82,10 +82,14 @@ Page({
         'appSecret': app.api.appSecret,
       },
       success:function(res) {
-        if (res.statusCode == 200) {
+        if (res.statusCode != 200) {
+          console.error('GetNewRoomOnline failed: ', res.statusCode, res.data)
+          wx.showToast({ title: '加载失败，请重试', icon: 'none' })
+        } else {
           var resposneData = res.data;
           if (resposneData.code != 100) {
-            //
+            console.error('GetNewRoomOnline returned error: ', resposneData)
+            wx.showToast({ title: resposneData.msg || '加载失败，请重试', icon: 'none' })
           } else {
             var dataLength = resposneData.data.list.length;
             if (dataLength > 0) {
@@ -98,7 +102,9 @@ Page({
           }
         }
       },
-      fail:function() {
+      fail:function(e) {
+        console.error('GetNewRoomOnline request failed: ', e)
+        wx.showToast({ title: '网络异常，请重试', icon: 'none' })
       },
       complete:function() {
         that.setData({
@@ -113,26 +119,22 @@ Page({
     wx.setStorage({
       key: key,
       data: data,
-      success: function() {
-        return true
-      },
-      fail: function() {
-        return false
-      },
-      complete: function() {
+      fail: function(e) {
+        console.error('setStorage failed: ', key, e)
       }
     })
   },
 
-  // 读取数据 ...目前无调用
-  getCachedData: function(key) {
+  // 读取数据，cb(err, data)
+  getCachedData: function(key, cb) {
     wx.getStorage({
       key: key,
       success: function(res) {
+        typeof cb == 'function' && cb(null, res.data)
       },
-      fail: function() {
-      },
-      complete: function() {
+      fail: function(e) {
+        console.error('getStorage failed: ', key, e)
+        typeof cb == 'function' && cb(e, null)
       }
     })
   }

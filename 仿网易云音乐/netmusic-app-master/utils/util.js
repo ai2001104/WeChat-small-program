@@ -157,6 +157,10 @@ function loadrec(offset, limit, id, cb) {
         data.comments[i].time = formatTime(data.comments[i].time, 2);
       };
       cb && cb(data)
+    },
+    fail: function (err) {
+      console.error('loadrec request failed: ', err);
+      wx.showToast({ title: '评论加载失败', icon: 'none' });
     }
   })
 }
@@ -183,6 +187,13 @@ function loadlrc(that) {
         that.setData({
           lrc: res.data
         });
+      },
+      fail: function (err) {
+        console.error('loadlrc request failed: ', err);
+        that.setData({
+          showlrc: false
+        });
+        wx.showToast({ title: '歌词加载失败', icon: 'none' });
       }
     })
   }

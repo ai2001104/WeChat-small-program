@@ -54,6 +54,10 @@ Page( {
     try {
       wx.setStorageSync('pageData',pageData);
     } catch (e) {
+      console.error('setStorageSync pageData failed: ', e);
+      this.setData({ isCollect: !this.data.isCollect });
+      wx.showToast({ title: '收藏失败，请重试', icon: 'none' });
+      return;
     }
     console.log(pageData);
   },
@@ -114,7 +118,10 @@ function loadData() {
     data.body = utils.parseStory( data.body, isTheme );
     _this.setData( { news: data, pageShow: 'block' });
     wx.setNavigationBarTitle( { title: data.title }); //设置标题
-  }, null, () => {
+  }, ( error ) => {
+    console.error( 'getNewsDetail failed: ', error );
+    wx.showToast( { title: '加载失败，请下拉重试', icon: 'none' });
+  }, () => {
     _this.setData( { loading: false });
   });
 
@@ -122,5 +129,7 @@ function loadData() {
   requests.getStoryExtraInfo( id, ( data ) => {
     console.log( 'extra', data );
     _this.setData( { extraInfo: data });
+  }, ( error ) => {
+    console.error( 'getStoryExtraInfo failed: ', error );
   });
 }

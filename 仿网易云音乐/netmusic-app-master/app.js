@@ -71,10 +71,19 @@ App({
       url: bsurl+'fm?t=' + (new Date()).getTime(),
       method: 'GET',
       success: function (res) {
+        if (!res.data || !res.data.data || !res.data.data.length) {
+          console.error('getfm returned no data: ', res.statusCode, res.data);
+          wx.showToast({ title: '获取FM列表失败', icon: 'none' });
+          return;
+        }
         that.globalData.list_fm = res.data.data;
         that.globalData.index_fm = 0;
         that.globalData.curplay = res.data.data[0];
         that.seekmusic(2);
+      },
+      fail: function (err) {
+        console.error('getfm request failed: ', err);
+        wx.showToast({ title: '获取FM列表失败', icon: 'none' });
       }
     })
   },

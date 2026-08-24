@@ -10,13 +10,7 @@ function selectBooks(params, cb) {
         data: params
     };
 
-    util.request(option, (res, err) => {
-        if (err) {
-            cb(err);
-        } else {
-            cb(res);
-        }
-    });
+    util.request(option, cb);
 
     // util.request(option).then(function (res, err) {
     //     if (err) {
@@ -34,13 +28,7 @@ function selectBookFromDouban(isbn13, cb) {
         url: config.doubanUrl + isbn13
     };
 
-    util.request(option, (res, err) => {
-        if (err) {
-            cb(err);
-        } else {
-            cb(res);
-        }
-    });
+    util.request(option, cb);
 
     // return new Promise(function (resolve, reject) {
     //     util.request(option).then(function (res, err) {
@@ -61,13 +49,7 @@ function selectBookFromDouban(isbn13, cb) {
 
 function put(option, cb) {
 
-    util.request(option, (res, err) => {
-        if (err) {
-            cb(err);
-        } else {
-            cb(res);
-        }
-    });
+    util.request(option, cb);
 
     // return new Promise(function (resolve, reject) {
     //     util.request(option).then(function (res, err) {
@@ -88,13 +70,7 @@ function getOpenId(code, cb) {
         url: `https://api.weixin.qq.com/sns/jscode2session?appid=${appID}&secret=${appSecret}&js_code=${code}&grant_type=authorization_code`
     };
 
-    util.request(option, (res, err) => {
-        if (err) {
-            cb(err);
-        } else {
-            cb(res);
-        }
-    });
+    util.request(options, cb);
 
 }
 

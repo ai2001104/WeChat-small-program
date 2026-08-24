@@ -30,8 +30,8 @@ Page({
         success: function() {
           console.log('大家闪开，我要跳转了！')
         },
-        fail: function() {
-          console.log('卧槽，跳转失败')
+        fail: function(e) {
+          console.error('redirectTo /pages/share/index failed: ', e)
         },
         complete: function() {
           console.log('预备，跳')
@@ -46,9 +46,8 @@ Page({
         var uid = res.data.uid
         that.fetchData(token, uid)
       },
-      fail: function() {
-      },
-      complete: function() {
+      fail: function(e) {
+        console.error('getStorage loginInfo failed: ', e)
       }
     })
   },
@@ -67,10 +66,14 @@ Page({
         'token': token
       },
       success:function(res) {
+        if (res.statusCode != 200) {
+          console.error('fetch me/index failed: ', res.statusCode, res.data)
+          return
+        }
         console.log(res.data)
       },
-      fail:function() {
-        console.log()
+      fail:function(e) {
+        console.error('fetch me/index request failed: ', e)
       },
       complete:function() {
         console.log('request complete')
