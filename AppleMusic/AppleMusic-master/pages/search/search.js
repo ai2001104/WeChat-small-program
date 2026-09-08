@@ -1,3 +1,6 @@
+var audio = require('../../utils/audio.js')
+var http = require('../../utils/request.js')
+
 var pageObject = {
         data:{
 
@@ -5,7 +8,7 @@ var pageObject = {
         search:function(e){
             var that = this
             console.log('搜索')
-            wx.request({
+            http.request({
                 url: 'http://c.y.qq.com/splcloud/fcgi-bin/smartbox_new.fcg',
                 data: {
                     is_xml:0,
@@ -21,9 +24,6 @@ var pageObject = {
                     notice:0,
                     platform:'yqq',
                     needNewCode:0,
-                },
-                header: {
-                    'Content-Type': 'text/html;charset=utf-8'
                 },
                 success: function(res) {
                     // var pattern =new RegExp("\\((.*?)\\)","igm");
@@ -42,16 +42,8 @@ var pageObject = {
             //     playBar:res,
             //     playingSongsNum:event.currentTarget.dataset.num
             // })
-            console.log('http://stream.qqmusic.tc.qq.com/'+res.id+'.mp3')
-            wx.playBackgroundAudio({
-                dataUrl: 'http://stream.qqmusic.tc.qq.com/'+res.id+'.mp3',
-                title: res.name,
-                singer: res.singer,
-                coverImgUrl: 'http://y.gtimg.cn/music/photo_new/T002R90x90M000003RMaRI1iFoYd.jpg',
-                complete: function (res) {
-                    
-                }
-            })
+            console.log(audio.streamUrl(res))
+            audio.play(res)
         }
 }
 

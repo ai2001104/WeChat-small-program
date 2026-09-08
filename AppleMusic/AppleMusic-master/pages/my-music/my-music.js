@@ -1,4 +1,6 @@
 var util = require('../../utils/util.js')
+var audio = require('../../utils/audio.js')
+var http = require('../../utils/request.js')
 var items = ['播放列表', '歌曲', '专辑', '演唱者']
 var _songsList=[{
       dataUrl:'http://stream.qqmusic.tc.qq.com/137192078.mp3',
@@ -43,6 +45,12 @@ var _albumList = [{
       image:'http://y.gtimg.cn/music/photo_new/T002R300x300M000001uqejs3d6EID.jpg?max_age=2592000'
     }]
 
+function toggleActionSheet(e) {
+  this.setData({
+    actionSheetHidden: !this.data.actionSheetHidden
+  })
+}
+
 var pageObject = {
   data: {
     playing:false,
@@ -55,7 +63,7 @@ var pageObject = {
       dataUrl:'http://stream.qqmusic.tc.qq.com/137192078.mp3',
       name: '告白气球',
       singer:'周杰伦',
-      coverImgUrl: 'http://y.gtimg.cn/music/photo_new/T002R90x90M000003RMaRI1iFoYd.jpg'
+      coverImgUrl: audio.DEFAULT_COVER_IMG_URL
     },
     songsList:_songsList,
     albumList :_albumList
@@ -64,16 +72,8 @@ var pageObject = {
     var that = this
 
   },
-  actionSheetTap: function(e) {
-    this.setData({
-      actionSheetHidden: !this.data.actionSheetHidden
-    })
-  },
-  actionSheetChange: function(e) {
-    this.setData({
-      actionSheetHidden: !this.data.actionSheetHidden
-    })
-  },
+  actionSheetTap: toggleActionSheet,
+  actionSheetChange: toggleActionSheet,
   onLoad: function () {
     var that = this
     wx.onBackgroundAudioStop(function () {
@@ -90,26 +90,18 @@ var pageObject = {
           playBar:res,
           playingSongsNum:event.currentTarget.dataset.num
     })
-    wx.playBackgroundAudio({
-      dataUrl: res.dataUrl,
-      name: res.name,
-      singer:res.singer,
-      coverImgUrl: res.coverImgUrl,
-      complete: function (res) {
-        that.setData({
-          playing: true
-        })
-      }
+    audio.play(res, function () {
+      that.setData({
+        playing: true
+      })
     })
   },
   pause: function () {
     var that = this
-    wx.pauseBackgroundAudio({
-      success: function () {
-        that.setData({
-          playing: false
-        })
-      }
+    audio.pause(function () {
+      that.setData({
+        playing: false
+      })
     })
   },
   onUnload: function () {
@@ -118,13 +110,10 @@ var pageObject = {
   onShow:function(){
     var that = this
     
-      wx.request({
+      http.request({
         url: 'http://120.27.93.97/weappserver/get_music.php',
         data: {
           mid: getApp().globalData.playing.mid
-        },
-        header: {
-            'Content-Type': 'text/html;charset=utf-8'
         },
         success: function(res) {
           console.log(res.data)
@@ -142,61 +131,24 @@ var pageObject = {
   }
 }
 
- for (var i = 0; i < items.length; ++i) {
-   (function(itemName) {
-     switch(itemName){
-       case '播放列表':
-          pageObject['bind' + itemName] = function(e) {
-          console.log('click' + itemName, e)
-          this.setData({
-            musicGroupName:itemName,
-            listTemplateName:'music-play-list',
-            templateData:null,
-            actionSheetHidden: !this.data.actionSheetHidden
-          })
-        }
-       break;
+var _groups = {
+  '播放列表': {listTemplateName: 'music-play-list', templateData: null},
+  '歌曲': {listTemplateName: 'songs-list', templateData: _songsList},
+  '专辑': {listTemplateName: 'album-list', templateData: _albumList},
+  '演唱者': {listTemplateName: 'singer-list', templateData: null}
+}
 
-       case '歌曲':
-          pageObject['bind' + itemName] = function(e) {
-          console.log('click' + itemName, e)
-          this.setData({
-            musicGroupName:itemName,
-            listTemplateName:'songs-list',
-            templateData:_songsList,
-            actionSheetHidden: !this.data.actionSheetHidden
-          })
-        }
-       break;
-
-       case '专辑':
-          pageObject['bind' + itemName] = function(e) {
-          console.log('click' + itemName, e)
-          this.setData({
-            musicGroupName:itemName,
-            listTemplateName:'album-list',
-            templateData:_albumList,
-            actionSheetHidden: !this.data.actionSheetHidden
-          })
-        }
-       break;
-
-       case '演唱者':
-          pageObject['bind' + itemName] = function(e) {
-          console.log('click' + itemName, e)
-          this.setData({
-            musicGroupName:itemName,
-            listTemplateName:'singer-list',
-            templateData:null,
-            actionSheetHidden: !this.data.actionSheetHidden
-          })
-        }
-       break;
-     }
-
-   })(items[i])
- }
-
-
+items.forEach(function (itemName) {
+  var group = _groups[itemName]
+  pageObject['bind' + itemName] = function (e) {
+    console.log('click' + itemName, e)
+    this.setData({
+      musicGroupName: itemName,
+      listTemplateName: group.listTemplateName,
+      templateData: group.templateData,
+      actionSheetHidden: !this.data.actionSheetHidden
+    })
+  }
+})
 
 Page(pageObject)
